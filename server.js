@@ -9,12 +9,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // CORS configuration
-const corsOptions = {
-  origin: ['https://frontendreddit-cin1-96481f2op-ninjabtk66-gmailcoms-projects.vercel.app', 'http://localhost:3000'],
-  optionsSuccessStatus: 200
-};
+app.use(cors({
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all methods
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use('/api/posts', postsRouter);
@@ -24,7 +24,7 @@ app.get('/health', (req, res) => {
 });
 
 // Handle preflight requests
-app.options('*', cors(corsOptions));
+app.options('*', cors());
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
