@@ -2,20 +2,31 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 
+// Custom axios instance with proper headers
+const redditAPI = axios.create({
+  headers: {
+    'User-Agent': 'MyRedditClone/1.0.0 (by /u/Mission-Bid-811)'  // Replace with your Reddit username
+  }
+});
+
 router.get('/:sort', async (req, res) => {
   try {
     const { sort } = req.params;
     const limit = req.query.limit || 10;
     
-    const response = await axios.get(
-      `https://www.reddit.com/r/popular/${sort}.json?limit=${limit}`
+    const response = await redditAPI.get(
+      `https://www.reddit.com/r/popular/${sort}.json?limit=${limit}&raw_json=1`
     );
     
     const posts = response.data.data.children.map(child => child.data);
     res.json(posts);
   } catch (error) {
     console.error('Error fetching posts:', error);
-    res.status(500).json({ error: 'Failed to fetch posts' });
+    if (error.response?.status === 429) {
+      res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+    } else {
+      res.status(500).json({ error: 'Failed to fetch posts' });
+    }
   }
 });
 
@@ -26,17 +37,20 @@ router.get('/search', async (req, res) => {
       return res.status(400).json({ error: 'Search query is required' });
     }
     
-    const response = await axios.get(
-      `https://www.reddit.com/search.json?q=${encodeURIComponent(q)}`
+    const response = await redditAPI.get(
+      `https://www.reddit.com/search.json?q=${encodeURIComponent(q)}&raw_json=1`
     );
     
     const posts = response.data.data.children.map(child => child.data);
     res.json(posts);
   } catch (error) {
     console.error('Error searching posts:', error);
-    res.status(500).json({ error: 'Failed to search posts' });
+    if (error.response?.status === 429) {
+      res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+    } else {
+      res.status(500).json({ error: 'Failed to search posts' });
+    }
   }
 });
 
 module.exports = router;
-
