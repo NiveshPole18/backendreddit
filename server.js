@@ -6,32 +6,26 @@ const postsRouter = require('./routes/posts');
 dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-// CORS configuration
-app.use(cors({
-  origin: 'https://frontendreddit-cin1.vercel.app', // Remove trailing slash
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+const corsOptions = {
+  origin: [
+    'https://frontendreddit-cin1.vercel.app',
+    'https://frontendreddit-cin1-g36bgs53k-ninjabtk66-gmailcoms-projects.vercel.app'
+  ],
   credentials: true,
-}));
+  optionsSuccessStatus: 200
+};
 
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// API Routes
 app.use('/api/posts', postsRouter);
 
-// Health check route
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Internal Server Error' });
-});
-
-// Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
