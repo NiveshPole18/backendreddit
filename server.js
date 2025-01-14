@@ -28,4 +28,5 @@ app.get('/health', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(`Reddit Client ID: ${process.env.REDDIT_CLIENT_ID}`); // For verification, remove in production
 });
