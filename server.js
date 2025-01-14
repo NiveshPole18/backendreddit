@@ -21,32 +21,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Posts routes
-app.get('/api/posts/:sort', async (req, res) => {
-  try {
-    const { sort } = req.params;
-    const limit = req.query.limit || 10;
-    const posts = await postsRouter.fetchPosts(sort, limit);
-    res.json(posts);
-  } catch (error) {
-    console.error('Error fetching posts:', error);
-    res.status(500).json({ error: 'Failed to fetch posts' });
-  }
-});
-
-app.get('/api/posts/search', async (req, res) => {
-  try {
-    const { q } = req.query;
-    if (!q) {
-      return res.status(400).json({ error: 'Search query is required' });
-    }
-    const posts = await postsRouter.searchPosts(q);
-    res.json(posts);
-  } catch (error) {
-    console.error('Error searching posts:', error);
-    res.status(500).json({ error: 'Failed to search posts' });
-  }
-});
+// Mount the router
+app.use('/api/posts', postsRouter);
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
